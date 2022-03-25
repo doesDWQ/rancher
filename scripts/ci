@@ -1,9 +1,11 @@
 #!/bin/bash
-set -e
+set -ex
 
 cd $(dirname $0)
 
+# 校验环境
 ./validate
+# 构建二进制
 ./build
 ./test
 ./package
