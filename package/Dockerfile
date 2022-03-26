@@ -1,14 +1,19 @@
 FROM ubuntu:18.04
+# 安装基础组件并且设置权限
 RUN apt-get update && apt-get install -y git curl ca-certificates unzip xz-utils && \
     useradd rancher && \
     mkdir -p /var/lib/rancher/etcd /var/lib/cattle /opt/jail /opt/drivers/management-state/bin && \
     chown -R rancher /var/lib/rancher /var/lib/cattle /usr/local/bin
+
+# 设置config配置文件
 RUN mkdir /root/.kube && \
     ln -s /etc/rancher/k3s/k3s.yaml /root/.kube/k3s.yaml  && \
     ln -s /etc/rancher/k3s/k3s.yaml /root/.kube/config && \
     ln -s /usr/bin/rancher /usr/bin/reset-password && \
     ln -s /usr/bin/rancher /usr/bin/ensure-default-admin && \
     rm -f /bin/sh && ln -s /bin/bash /bin/sh
+
+# 设置工作目录
 WORKDIR /var/lib/rancher
 
 ARG ARCH=amd64
@@ -42,6 +47,7 @@ ENV CATTLE_FLEET_MIN_VERSION=0.3.500
 ENV CATTLE_RANCHER_OPERATOR_MIN_VERSION=0.1.400
 ENV CATTLE_RANCHER_WEBHOOK_MIN_VERSION=0.1.200
 
+# 下载各种依赖库
 RUN mkdir -p /var/lib/rancher-data/local-catalogs/system-library && \
     mkdir -p /var/lib/rancher-data/local-catalogs/library && \
     mkdir -p /var/lib/rancher-data/local-catalogs/helm3-library && \
@@ -53,16 +59,19 @@ RUN mkdir -p /var/lib/rancher-data/local-catalogs/system-library && \
     git clone -b master --single-branch https://github.com/rancher/charts /var/lib/rancher-data/local-catalogs/library && \
     git clone -b master --single-branch https://github.com/rancher/helm3-charts /var/lib/rancher-data/local-catalogs/helm3-library
 
+# 下载rancher-machine
 RUN curl -sLf https://github.com/rancher/machine/releases/download/${CATTLE_MACHINE_VERSION}/rancher-machine-${ARCH}.tar.gz | tar xvzf - -C /usr/bin && \
     curl -sLf https://github.com/rancher/loglevel/releases/download/${LOGLEVEL_VERSION}/loglevel-${ARCH}-${LOGLEVEL_VERSION}.tar.gz | tar xvzf - -C /usr/bin && \
     curl -LO https://github.com/linode/docker-machine-driver-linode/releases/download/${DOCKER_MACHINE_LINODE_VERSION}/docker-machine-driver-linode_linux-amd64.zip && \
     unzip docker-machine-driver-linode_linux-amd64.zip -d /opt/drivers/management-state/bin && \
     rm docker-machine-driver-linode_linux-amd64.zip
 
+# tni下载地址
 ENV TINI_URL_amd64=https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini \
     TINI_URL_arm64=https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-arm64 \
     TINI_URL=TINI_URL_${ARCH}
 
+# rancher-heml
 ENV HELM_URL_V2_amd64=https://github.com/rancher/helm/releases/download/${CATTLE_HELM_VERSION}/rancher-helm \
     HELM_URL_V2_arm64=https://github.com/rancher/helm/releases/download/${CATTLE_HELM_VERSION}/rancher-helm-arm64 \
     HELM_URL_V2=HELM_URL_V2_${ARCH} \
@@ -126,6 +135,7 @@ ENV AUDIT_LOG_MAXBACKUP 10
 ENV AUDIT_LOG_MAXSIZE 100
 ENV AUDIT_LEVEL 0
 
+# 处理前端
 RUN mkdir -p /usr/share/rancher/ui && \
     cd /usr/share/rancher/ui && \
     curl -sL https://releases.rancher.com/ui/${CATTLE_UI_VERSION}.tar.gz | tar xvzf - --strip-components=1 && \
