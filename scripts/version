@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 shopt -s extglob
 
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then

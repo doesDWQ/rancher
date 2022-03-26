@@ -115,5 +115,5 @@ VOLUME /var/lib/rancher
 VOLUME /var/lib/kubelet
 WORKDIR ${DAPPER_SOURCE}
 
-# ENTRYPOINT ["./scripts/entry"]
-# CMD ["ci"]
+ENTRYPOINT ["./scripts/entry"]
+CMD ["ci"]

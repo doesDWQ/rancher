@@ -7,6 +7,8 @@ cd $(dirname $0)
 ./validate
 # 构建二进制
 ./build
+# 测试
 ./test
+# 打包
 ./package
 ./chart/ci
