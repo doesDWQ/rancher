@@ -5,4 +5,4 @@ set -ex
 ./scripts/build-server
 
 # 运行程序
-./scripts/run > ./run.log
+./scripts/run
